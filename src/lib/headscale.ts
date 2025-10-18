@@ -55,11 +55,7 @@ class HeadscaleAPI {
     });
   }
 
-  // Node/Machine Management
-  async listNodes() {
-    return this.request('/node');
-  }
-
+  // Node Management - Filter by user
   async listUserNodes(userName: string) {
     const allNodes = await this.request('/node');
     if (allNodes.nodes) {
@@ -130,21 +126,23 @@ class HeadscaleAPI {
     });
   }
 
-  // Pre-auth Keys
+  // Pre-auth Keys - FIXED VERSION
   async createPreAuthKey(user: string, reusable: boolean = false, ephemeral: boolean = false, expiration?: string, aclTags: string[] = []) {
     const body: any = {
-      user,
-      reusable,
-      ephemeral,
+      user: user,
+      reusable: reusable,
+      ephemeral: ephemeral,
     };
     
     if (expiration) {
-      body.expiration = expiration;
+      body.expiration = new Date(expiration).toISOString();
     }
     
     if (aclTags.length > 0) {
       body.aclTags = aclTags;
     }
+
+    console.log('Creating pre-auth key with body:', body);
 
     return this.request('/preauthkey', {
       method: 'POST',
@@ -153,14 +151,14 @@ class HeadscaleAPI {
   }
 
   async listPreAuthKeys(user?: string) {
-    const endpoint = user ? `/preauthkey?user=${user}` : '/preauthkey';
+    const endpoint = user ? `/preauthkey?user=${encodeURIComponent(user)}` : '/preauthkey';
     return this.request(endpoint);
   }
 
   async expirePreAuthKey(user: string, key: string) {
     return this.request(`/preauthkey/expire`, {
       method: 'POST',
-      body: JSON.stringify({ user, key }),
+      body: JSON.stringify({ user: user, key: key }),
     });
   }
 

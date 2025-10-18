@@ -37,7 +37,9 @@ export default function AccessKeys({ userName }: AccessKeysProps) {
 
   const fetchKeys = async () => {
     try {
-      const response = await fetch(`/api/preauthkeys?user=${userName}`)
+      setLoading(true)
+      const cleanUser = userName.replace(/[^a-z0-9-]/g, '');
+      const response = await fetch(`/api/preauthkeys?user=${encodeURIComponent(cleanUser)}`)
       const data = await response.json()
       
       if (data.success) {
@@ -132,17 +134,24 @@ export default function AccessKeys({ userName }: AccessKeysProps) {
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString()
+      if (!dateString) return 'Never';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } catch {
-      return 'Invalid date'
+      return 'Invalid date';
     }
   }
 
   const getKeyType = (key: PreAuthKey) => {
-    if (key.reusable && key.ephemeral) return 'Reusable Ephemeral'
-    if (key.reusable) return 'Reusable'
-    if (key.ephemeral) return 'One-time Ephemeral'
-    return 'One-time'
+    if (key.reusable && key.ephemeral) return 'Reusable Ephemeral';
+    if (key.reusable) return 'Reusable';
+    if (key.ephemeral) return 'One-time Ephemeral';
+    return 'One-time';
+  }
+
+  const getStatusColor = (used: boolean) => {
+    return used ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
   }
 
   if (loading) {
@@ -378,14 +387,12 @@ export default function AccessKeys({ userName }: AccessKeysProps) {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          key.used ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(key.used)}`}>
                           {key.used ? 'Used' : 'Active'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {key.expiration ? formatDate(key.expiration) : 'Never'}
+                        {formatDate(key.expiration)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(key.createdAt)}
