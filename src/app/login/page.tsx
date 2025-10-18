@@ -3,6 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+// Function to clean username - same as in signup
+const cleanUsername = (email: string) => {
+  const username = email.split('@')[0].toLowerCase();
+  return username.replace(/[^a-z0-9-]/g, '');
+}
+
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,12 +22,13 @@ export default function Login() {
     setMessage('')
 
     try {
+      const userName = cleanUsername(email);
+      
       // Check if user exists in Headscale
       const response = await fetch('/api/users')
       const data = await response.json()
 
       if (data.success) {
-        const userName = email.split('@')[0].toLowerCase()
         const userExists = data.users.some((user: any) => user.name === userName)
         
         if (userExists) {
@@ -115,26 +122,6 @@ export default function Login() {
               </button>
             </div>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                Google
-              </button>
-              <button className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                GitHub
-              </button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center">
             <a href="/signup" className="text-blue-600 hover:text-blue-500">

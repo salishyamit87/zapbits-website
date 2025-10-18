@@ -3,6 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+// Function to clean username - only allow lowercase letters, numbers, hyphens
+const cleanUsername = (email: string) => {
+  // Extract username from email and clean it
+  const username = email.split('@')[0].toLowerCase();
+  // Remove all special characters except letters, numbers, and hyphens
+  return username.replace(/[^a-z0-9-]/g, '');
+}
+
 export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,18 +24,26 @@ export default function Signup() {
     setMessage('')
 
     try {
+      const userName = cleanUsername(email);
+      
+      // Check if username is valid
+      if (userName.length === 0) {
+        setMessage('❌ Please enter a valid email address');
+        return;
+      }
+
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, userName }),
       })
 
       const data = await response.json()
 
       if (data.success) {
-        setMessage('✅ Account created successfully in Headscale! You can now login.')
+        setMessage(`✅ Account created successfully! Username: ${userName}`)
         setEmail('')
         setPassword('')
         setTimeout(() => {
@@ -36,9 +52,8 @@ export default function Signup() {
       } else {
         setMessage(`❌ Error: ${data.error}`)
       }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setMessage(`❌ Network error: ${errorMessage}`)
+    } catch (error: any) {
+      setMessage(`❌ Network error: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -83,6 +98,9 @@ export default function Signup() {
                   placeholder="your@email.com"
                 />
               </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Username will be automatically generated from your email
+              </p>
             </div>
 
             <div>
