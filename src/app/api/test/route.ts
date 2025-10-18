@@ -6,14 +6,21 @@ export async function GET() {
     // Test users list
     const users = await headscale.listUsers()
     
-    // Test nodes list
-    const nodes = await headscale.listNodes()
+    // Test nodes list (get all nodes for test)
+    const allNodes = await headscale.listUsers()
+    let nodesCount = 0
+    if (allNodes.users) {
+      for (const user of allNodes.users) {
+        const userNodes = await headscale.listUserNodes(user.name)
+        nodesCount += userNodes.nodes?.length || 0
+      }
+    }
     
     return NextResponse.json({
       success: true,
       apiStatus: 'Working',
       usersCount: users.users?.length || 0,
-      nodesCount: nodes.nodes?.length || 0,
+      nodesCount: nodesCount,
       message: 'Headscale API is connected successfully!'
     })
   } catch (error: unknown) {

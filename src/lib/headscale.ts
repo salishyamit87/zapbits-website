@@ -55,9 +55,15 @@ class HeadscaleAPI {
     });
   }
 
-  // Node Management
-  async listNodes() {
-    return this.request('/node');
+  // Node Management - Filter by user
+  async listUserNodes(userName: string) {
+    const allNodes = await this.request('/node');
+    if (allNodes.nodes) {
+      return {
+        nodes: allNodes.nodes.filter((node: any) => node.user.name === userName)
+      };
+    }
+    return { nodes: [] };
   }
 
   async getNode(nodeId: string) {
@@ -76,21 +82,10 @@ class HeadscaleAPI {
     });
   }
 
-  // API Key Management
-  async createApiKey(expiration: string) {
-    return this.request('/apikey', {
+  async renameNode(nodeId: string, newName: string) {
+    return this.request(`/node/${nodeId}/rename`, {
       method: 'POST',
-      body: JSON.stringify({ expiration }),
-    });
-  }
-
-  async listApiKeys() {
-    return this.request('/apikey');
-  }
-
-  async deleteApiKey(prefix: string) {
-    return this.request(`/apikey/${prefix}`, {
-      method: 'DELETE',
+      body: JSON.stringify({ name: newName }),
     });
   }
 
