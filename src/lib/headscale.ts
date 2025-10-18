@@ -55,7 +55,11 @@ class HeadscaleAPI {
     });
   }
 
-  // Node Management - Filter by user
+  // Node/Machine Management
+  async listNodes() {
+    return this.request('/node');
+  }
+
   async listUserNodes(userName: string) {
     const allNodes = await this.request('/node');
     if (allNodes.nodes) {
@@ -89,26 +93,116 @@ class HeadscaleAPI {
     });
   }
 
-  // Pre-auth Keys
-  async createPreAuthKey(user: string, reusable: boolean = false, ephemeral: boolean = false) {
-    return this.request('/preauthkey', {
+  async moveNode(nodeId: string, newUser: string) {
+    return this.request(`/node/${nodeId}/user`, {
       method: 'POST',
-      body: JSON.stringify({
-        user,
-        reusable,
-        ephemeral,
-      }),
+      body: JSON.stringify({ user: newUser }),
     });
   }
 
-  async listPreAuthKeys(user: string) {
-    return this.request(`/preauthkey?user=${user}`);
+  async setNodeTags(nodeId: string, tags: string[]) {
+    return this.request(`/node/${nodeId}/tags`, {
+      method: 'POST',
+      body: JSON.stringify({ tags }),
+    });
+  }
+
+  // Routes Management
+  async listRoutes() {
+    return this.request('/routes');
+  }
+
+  async enableRoute(routeId: string) {
+    return this.request(`/routes/${routeId}/enable`, {
+      method: 'POST',
+    });
+  }
+
+  async disableRoute(routeId: string) {
+    return this.request(`/routes/${routeId}/disable`, {
+      method: 'POST',
+    });
+  }
+
+  async deleteRoute(routeId: string) {
+    return this.request(`/routes/${routeId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Pre-auth Keys
+  async createPreAuthKey(user: string, reusable: boolean = false, ephemeral: boolean = false, expiration?: string, aclTags: string[] = []) {
+    const body: any = {
+      user,
+      reusable,
+      ephemeral,
+    };
+    
+    if (expiration) {
+      body.expiration = expiration;
+    }
+    
+    if (aclTags.length > 0) {
+      body.aclTags = aclTags;
+    }
+
+    return this.request('/preauthkey', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  }
+
+  async listPreAuthKeys(user?: string) {
+    const endpoint = user ? `/preauthkey?user=${user}` : '/preauthkey';
+    return this.request(endpoint);
   }
 
   async expirePreAuthKey(user: string, key: string) {
     return this.request(`/preauthkey/expire`, {
       method: 'POST',
       body: JSON.stringify({ user, key }),
+    });
+  }
+
+  // API Keys
+  async createApiKey(expiration: string) {
+    return this.request('/apikey', {
+      method: 'POST',
+      body: JSON.stringify({ expiration }),
+    });
+  }
+
+  async listApiKeys() {
+    return this.request('/apikey');
+  }
+
+  async deleteApiKey(prefix: string) {
+    return this.request(`/apikey/${prefix}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // DNS Management
+  async getDNSConfig() {
+    return this.request('/dns');
+  }
+
+  async setDNSConfig(config: any) {
+    return this.request('/dns', {
+      method: 'POST',
+      body: JSON.stringify(config),
+    });
+  }
+
+  // ACL Management
+  async getACL() {
+    return this.request('/acl');
+  }
+
+  async setACL(acl: any) {
+    return this.request('/acl', {
+      method: 'POST',
+      body: JSON.stringify(acl),
     });
   }
 }
