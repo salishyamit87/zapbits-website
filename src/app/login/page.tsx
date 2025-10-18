@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Login() {
@@ -89,9 +90,9 @@ export default function Login() {
           </div>
 
           <div className="mt-6 text-center">
-            <a href="/signup" className="text-blue-600 hover:text-blue-500">
-              Don't have an account? Sign up
-            </a>
+            <Link href="/signup" className="text-blue-600 hover:text-blue-500">
+              Don&apos;t have an account? Sign up
+            </Link>
           </div>
         </div>
       </div>

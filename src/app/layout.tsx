@@ -1,5 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,18 +21,18 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between h-16">
               <div className="flex items-center">
-                <a href="/" className="flex-shrink-0">
+                <Link href="/" className="flex-shrink-0">
                   <h1 className="text-2xl font-bold text-blue-600">ZapBits</h1>
-                </a>
+                </Link>
                 <div className="hidden md:ml-6 md:flex md:space-x-8">
-                  <a href="/" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
-                  <a href="/features" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Features</a>
-                  <a href="/contact" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
+                  <Link href="/" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</Link>
+                  <Link href="/features" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Features</Link>
+                  <Link href="/contact" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</Link>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <a href="/login" className="text-gray-700 hover:text-blue-600">Login</a>
-                <a href="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">Sign Up</a>
+                <Link href="/login" className="text-gray-700 hover:text-blue-600">Login</Link>
+                <Link href="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">Sign Up</Link>
               </div>
             </div>
           </div>
