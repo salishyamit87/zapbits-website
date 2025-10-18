@@ -3,6 +3,18 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface User {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+interface UsersResponse {
+  success: boolean;
+  users: User[];
+  error?: string;
+}
+
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,11 +30,11 @@ export default function Login() {
     try {
       // Check if user exists in Headscale
       const response = await fetch('/api/users')
-      const data = await response.json()
+      const data: UsersResponse = await response.json()
 
       if (data.success) {
         const userName = email.split('@')[0].toLowerCase()
-        const userExists = data.users.some((user: any) => user.name === userName)
+        const userExists = data.users.some((user: User) => user.name === userName)
         
         if (userExists) {
           // Successful login
@@ -34,7 +46,7 @@ export default function Login() {
           setMessage('❌ User not found. Please sign up first.')
         }
       } else {
-        setMessage('❌ Error checking user: ' + data.error)
+        setMessage('❌ Error checking user: ' + (data.error || 'Unknown error'))
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
